@@ -328,7 +328,7 @@ Docker Container staten
 <br>
 <br>
 
-## Wiederanlaufplan
+## Wiederanlaufplan - RTO 1-2h
 1. SD-Karte des Backup Pis mit reinem Image bespielen - Netzwerkkonfig, User anlegen, SSH aktivieren
 
 2. SD-Karte in neuen Pi stecken, USB-Stick anstecken, Pi starten
