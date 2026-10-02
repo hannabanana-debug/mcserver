@@ -1,0 +1,22 @@
+#vor dem ersten Start MEMORYSIZE & volumes/source anpassen
+
+name: mcserver
+services:
+  mcserver:
+    container_name: mcserver
+    environment:
+      MEMORYSIZE: 3G
+      PAPERMC_FLAGS: ""
+    image: marctv/minecraft-papermc-server:latest
+    networks:
+      default: null
+    ports:
+      - "25565:25565"
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /home/admin/mcserver/weltdaten
+        bind: {}
+networks:
+  default:
+    name: mcserver_default
