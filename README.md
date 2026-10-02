@@ -1,8 +1,7 @@
 # mcserver
 Mit diesem Repo wird ein Minecraftserver auf einem Raspberry Pi aufgesetzt. <br>
 
-Es wurden ein Pi 5, 32GB SD-Karte und 32GB USB-Stick für Backups verwendet. <br>
-
+Es wurden ein **Pi 5, 32GB SD-Karte** und **32GB USB-Stick** für Backups verwendet.
 <br>
 <br>
 <br>
@@ -17,10 +16,10 @@ Raspberry Pi Imager:
 <br>
 
 ### IPv4
-IP: 192.168.88.230  
-Subnetz: 255.255.255.0  
-Gateway: 192.168.88.1  
-DNS: 192.168.88.1  <br>
+IP: 192.168.x.x  
+Subnetz: 255.255.x.x  
+Gateway: 192.168.x.x  
+DNS: 192.168.x.x  <br>
 
 <br>
 
@@ -40,14 +39,14 @@ mittels SSH auf Pi-IP aufschalten und als admin anmelden <br>
 **TigerVNC** für **GUI**<br>
 >https://sourceforge.net/projects/tigervnc/ <br>
 
-im Terminal: sudo raspi-config → 3 Interface Options → 3 VNC → aktivieren <br>
+im Terminal: <code>sudo raspi-config → 3 Interface Options → 3 VNC → aktivieren</code> <br>
 
 <br>
 <br>
 <br>
 
 ## Docker
->https://marc.tv/minecraft-java-raspberry-pi-docker/ <br>
+>https://marc.tv/minecraft-java-raspberry-pi-docker/ 
 <br>
 
 ### Docker installieren
@@ -68,9 +67,9 @@ cd - home-verzeichnis
 
 <code>curl -fsSL https://get.docker.com -o get-docker.sh</code> - docker installieren
 
-<code>chmod +x get-docker.sh</code> - sh mit dockerinstallationskram ausführbar machen
+<code>chmod +x get-docker.sh</code> - sh mit dockerinstallationsskript ausführbar machen
 
-<code>./get-docker.sh - sh</code> ausführen / docker installieren
+<code>./get-docker.sh</code> - sh ausführen / docker installieren
 
 <code>sudo apt-get install -y uidmap</code> - uidmap installieren, damit docker nicht im adminmodus ausgeführt wird
 
@@ -117,7 +116,7 @@ cd - home-verzeichnis
 <br>
 
 ## Verbindung zum Minecraft Server
-1. in Minecraft Version 26.2 (je nach latest release von papermc) starten
+1. Minecraft Version 26.2 (je nach latest release von papermc) starten
 
 2. bei Multiplayer die IP des Pis als Serveradresse hinterlegen
 
@@ -127,6 +126,7 @@ cd - home-verzeichnis
 
 ## Sicherung
 >https://raspberry.tips/raspberrypi-tutorials/raspberry-pi-datensicherung-erstellen <br>
+
 <br>
 
 ### shrink-backup
@@ -135,7 +135,7 @@ cd - home-verzeichnis
 erstellt bootbare .img Dateien
 <br>
 
-*USB-Stick mit exFAT(ext4)-dateifomat, um große Dateien speichern zu können*<br>
+*USB-Stick mit exFAT(ext4)-dateifomat benötigt, um große Dateien speichern zu können*<br>
 <br>
 
 #### USB-Stick formatieren
@@ -175,7 +175,7 @@ Stick auf dem Pi prüfen:<br>
 <br>
 
 ### rsync
-für manuelle Backups, ist bereits vorinstalliert<br>
+für manuelle Backups, ist bereits vorinstalliert - ist irrelevant für automatisierte Backups<br>
 
 ggf. mit <code>mkdir</code> Ordner für Backup erstellen<br>
 
@@ -215,7 +215,7 @@ Daten der Welt liegen unter <code>/home/admin/mcserver</code> (vorher in docker-
     sudo mkdir /mnt/backup
 
     # UUID des sticks ermitteln
-    sudo blkid          # UUID="5A0E-861B"
+    sudo blkid
 
     # Stick mittels ID mit Ordner koppeln; nofail, damit nichts abschmiert, wenn der mal nicht gekoppelt ist; user 1000 1000 damit ich dinge copy pasten kann
     sudo nano /etc/fstab       # UUID=EURE-UUID  /mnt/backup  exfat  defaults,nofail,uid=1000,gid=1000  0  0
@@ -226,7 +226,7 @@ Daten der Welt liegen unter <code>/home/admin/mcserver</code> (vorher in docker-
 
 Der Stick wird automatisch erkannt, wenn er beim Bootvorgang schon steckt. Wird er nachträglich eingesteckt, muss er manuell mittels <code>sudo mount -va</code> gemountet werden.
 
-Backups müssen in <code>/mnt/backup</code> geschoben werden und sind dann automatisch auf dem USB-Stick<br>
+Backups müssen in <code>/mnt/backup</code> geschoben werden und sind dann automatisch auf dem USB-Stick.<br>
 
 <br>
 
@@ -277,7 +277,12 @@ Backups müssen in <code>/mnt/backup</code> geschoben werden und sind dann autom
 <br>
 
 Zeit des Backups unter <code>sudo nano /etc/crontab
-</code> anpassen
+</code> anpassen <br>
+
+bspw:<br>
+
+    20 11 * * * root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+erstellt um 11:20 ein Backup
 
 <br>
 <br>
@@ -289,6 +294,33 @@ Zeit des Backups unter <code>sudo nano /etc/crontab
     git clone https://github.com/raspberry-tips/raspberry-pi-monitoring
 <br>
 
+    sudo cp /boot/firmware/cmdline.txt /boot/firmware/cmdline.txt.bak
+<br>
+
+    sudo nano /boot/firmware/cmdline.txt
+
+<code>cgroup_enable=memory cgroup_memory=1</code> ans Zeilenende mit Leerzeichen getrennt anhängen, damit RAM-Werte erfasst werden können
+
+<br>
+<br>
+
+    sudo reboot
+    # nach dem Neustart:
+    cat /sys/fs/cgroup/cgroup.controllers
+    # Ausgabe sollte memory beinhalten
+
+<br>
+<br>
+
+in <code>compose.yaml</code> <code>GF_SECURITY_ADMIN_PASSWORD: bitte-aendern</code> selbst gewähltes Passwort setzen (wird für Erstanmeldung bei Grafana gebraucht)  
+<br>
+in <code>grafana/provisioning/alerting/contactpoints.yml</code> <code> ntfy "topic":"your-topic-name-here"</code> entsprechend anpassen (wird für Versand von Alerts aus Grafana an Mobilgeräte benötigt)
+<br>
+
+Docker Container staten
+    cd raspberry-pi-monitoring
+    docker compose up -d
+
 *optional:* **ntfy** für Smartphone downloaden, topic abonnieren, und Push-Benachrichtugungen bei gesetzten Alarmen innerhalb Grafanas erhalten
 
 ![ntfy notification](/screenshots/ntfy_grafana-mobile.jpg)<br>
@@ -297,3 +329,48 @@ Zeit des Backups unter <code>sudo nano /etc/crontab
 <br>
 
 ## Wiederanlaufplan
+1. SD-Karte des Backup Pis mit reinem Image bespielen - Netzwerkkonfig, User anlegen, SSH aktivieren
+
+2. SD-Karte in neuen Pi stecken, USB-Stick anstecken, Pi starten
+
+3. IP auslesen / Adresse konfigurieren
+
+4. git clone https://github.com/hannabanana-debug/mcserver.git
+
+5. docker installieren
+    - cd
+    - curl -fsSL https://get.docker.com -o [get-docker.sh](http://get-docker.sh)
+    - chmod +x [get-docker.sh](http://get-docker.sh)
+    - ./get-docker.sh
+    - sudo apt-get install -y uidmap
+    - dockerd-rootless-setuptool.sh install
+    - sudo usermod -aG docker \$USER
+    - sudo systemctl enable docker
+    - newgrp docker
+
+6. mount USB-Stick
+    - sudo mkdir /mnt/backup
+    - sudo blkid
+    - sudo nano /etc/fstab # UUID=EURE-UUID /mnt/backup  exfat  defaults,nofail,uid=1000,gid=1000  0  0
+    - sudo mount -va
+
+7. Weltdaten wiederherstellen
+    - cp -r /mnt/backup/weltdaten/\* /home/admin/mcserver/weltdaten
+
+8. Rechte auf diesen Ordner ändern, damit Docker kopierte Ordner/Dateien verwenden kann
+    - sudo chown -R 1000:1000 /home/admin/mcserver/weltdaten
+    - sudo chmod -R u+rwX /home/admin/mcserver/weltdaten
+
+9. Docker Container starten
+    - cd /home/admin/mcserver
+    - docker compose up -d
+    - docker compose logs -f
+10. Erreichbarkeit des Servers/Weltstand prüfen
+
+11. Monitoring wiederherstellen und testen (raspi-IP:3000)
+    - cp -r /mnt/backup/monitoring/\* /home/admin/monitoring
+
+12. Backups einrichten
+    - mv /home/admin/mcserver/backup-weltdaten.sh /etc/cron-daily
+    - mv /home/admin/mcserver/backup-monitoring.sh /etc/cron-daily
+    - sudo nano /etc/crontab
