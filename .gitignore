@@ -1,0 +1,5 @@
+# Alle Dateien im Weltdaten-Ordner ignorieren
+/weltdaten/*
+
+# Die Platzhalterdatei weiterhin versionieren
+!/weltdaten/.gitkeep
