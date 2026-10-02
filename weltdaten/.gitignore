@@ -1,1 +1,7 @@
 # Dieser Ordner wird für die Weltdaten benötigt.
+
+# Alle Dateien in diesem Ordner ignorieren
+*
+
+# Diese .gitignore-Datei selbst nicht ignorieren
+!.gitignore
