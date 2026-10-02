@@ -323,7 +323,9 @@ Docker Container staten
 
 *optional:* **ntfy** für Smartphone downloaden, topic abonnieren, und Push-Benachrichtugungen bei gesetzten Alarmen innerhalb Grafanas erhalten
 
-![ntfy notification](/screenshots/ntfy_grafana-mobile.jpg)<br>
+![ntfy notification](/screenshots/ntfy-mobile.jpg)<br>
+
+![ntfy notification](/screenshots/grafana-dashboard.png)<br>
 
 <br>
 <br>
