@@ -16,6 +16,7 @@ services:
     volumes:
       - type: bind
         source: /home/admin/mcserver/weltdaten
+        target: /data
         bind: {}
 networks:
   default:
