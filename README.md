@@ -370,7 +370,12 @@ Docker Container staten
 10. Erreichbarkeit des Servers/Weltstand prüfen
 
 11. Monitoring wiederherstellen und testen (raspi-IP:3000)
-    - cp -r /mnt/backup/monitoring/\* /home/admin/monitoring
+    - cp -r /mnt/backup/monitoring/* /home/admin/monitoring
+    - Ordner anlegen, den das Bakcup selbst nicht anlegen kann, und Rechte verändern, damit dieser verwendet werden kann
+        - cd ~/monitoring
+        - sudo mkdir -p /var/lib/node_exporter
+        - sudo chown root:root /var/lib/node_exporter
+        - sudo chmod 755 /var/lib/node_exporter
 
 12. Backups einrichten
     - mv /home/admin/mcserver/backup-weltdaten.sh /etc/cron-daily
